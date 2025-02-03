@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRUD App with Multiple Rows</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.9); /* Semi-transparent white background */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 400px;
+            position: relative;
+            z-index: 2; /* Ensure content is above the background image */
+        }
+
+        .background-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 1; /* Ensure the image stays behind the container */
+            opacity: 0.3; /* Adjust opacity as needed */
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .form-container {
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: transform 0.3s ease, background-color 0.3s ease;
+        }
+
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        #saveButton {
+            background-color: #28a745;
+            color: white;
+        }
+
+        #updateButton {
+            background-color: #ffc107;
+            color: black;
+        }
+
+        #deleteButton {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        button:hover:not(:disabled) {
+            transform: scale(1.1);
+        }
+
+        .display-text {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            min-height: 50px;
+            transition: background-color 0.3s ease;
+        }
+
+        .record {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .record:hover {
+            background-color: #e9ecef;
+        }
+
+        .record-actions button {
+            margin-left: 5px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Image -->
+    <img src="https://images.unsplash.com/photo-1600880292203-5c4ba5d45b9d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80" alt="Background Image" class="background-image">
+
+    <div class="container">
+        <h1>CRUD App with Multiple Rows</h1>
+        <div class="form-container">
+            <input type="text" id="textInput" placeholder="Enter your text here...">
+            <button id="saveButton">Save</button>
+        </div>
+        <div id="recordsContainer"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const textInput = document.getElementById('textInput');
+            const saveButton = document.getElementById('saveButton');
+            const recordsContainer = document.getElementById('recordsContainer');
+
+            // Load data from localStorage
+            let records = JSON.parse(localStorage.getItem('records')) || [];
+
+            // Function to render records
+            function renderRecords() {
+                recordsContainer.innerHTML = '';
+                records.forEach((record, index) => {
+                    const recordDiv = document.createElement('div');
+                    recordDiv.classList.add('record');
+                    recordDiv.innerHTML = `
+                        <span>${record.text}</span>
+                        <div class="record-actions">
+                            <button onclick="editRecord(${index})">Edit</button>
+                            <button onclick="deleteRecord(${index})">Delete</button>
+                        </div>
+                    `;
+                    recordsContainer.appendChild(recordDiv);
+                });
+            }
+
+            // Save button functionality
+            saveButton.addEventListener('click', () => {
+                const text = textInput.value.trim();
+                if (text) {
+                    records.push({ text });
+                    localStorage.setItem('records', JSON.stringify(records));
+                    textInput.value = '';
+                    renderRecords();
+                }
+            });
+
+            // Edit record functionality
+            window.editRecord = (index) => {
+                const newText = prompt('Edit your text:', records[index].text);
+                if (newText !== null) {
+                    records[index].text = newText.trim();
+                    localStorage.setItem('records', JSON.stringify(records));
+                    renderRecords();
+                }
+            };
+
+            // Delete record functionality
+            window.deleteRecord = (index) => {
+                if (confirm('Are you sure you want to delete this record?')) {
+                    records.splice(index, 1);
+                    localStorage.setItem('records', JSON.stringify(records));
+                    renderRecords();
+                }
+            };
+
+            // Initial rendering of records
+            renderRecords();
+        });
+    </script>
+</body>
+</html>
